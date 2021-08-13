@@ -5,7 +5,7 @@ const axios = require('axios');
 app.use(express.static('static'));
 
 app.get('/api/price', async (request, response) => {
-  const {user_id, country} = request.query;
+  const {ip, country} = request.query;
   const products = request.query.products.split(',');
   const result = await axios({
     method: 'post',
@@ -14,7 +14,7 @@ app.get('/api/price', async (request, response) => {
       api_key: process.env.API_KEY
     },
     data: {
-      user_id,
+      ip,
       products,
       country
     },
