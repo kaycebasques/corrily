@@ -1,18 +1,13 @@
 const express = require('express');
 const app = express();
-const API_KEY = 'b82fd0fa-2a1b-4226-b6c0-22884ae97f84';
 const axios = require('axios');
 
-app.get('/', (request, response) => {
-  response.send('JAYCE');
-});
-
-app.get('/api/price', async (request, response) => {
+app.get('/', async (request, response) => {
   const result = await axios({
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
-      api_key: API_KEY
+      api_key: process.env.API_KEY
     },
     data: {
       products: ['monthly'],
@@ -24,7 +19,6 @@ app.get('/api/price', async (request, response) => {
     },
     // url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
     url: 'https://client.corrily.com/v1/prices'
-    // 
   });
   response.json(result.data);
 });
