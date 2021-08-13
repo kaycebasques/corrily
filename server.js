@@ -8,21 +8,23 @@ app.get('/', (request, response) => {
 });
 
 app.get('/test', async (request, response) => {
-  let result = await axios({
+  const result = await axios({
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
       api_key: API_KEY
     },
     data: {
-      products: 'monthly',
+      products: ['monthly'],
       country: 'BR',
       integrations: [
         'stripe'
-      ]
+      ],
+      'user_id': 'kayce'
     },
-    'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
+    url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
+  response.json(result.data);
 });
 
 app.listen(8080, () => {
