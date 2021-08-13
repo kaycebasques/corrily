@@ -7,17 +7,16 @@
   </head>
   <body>
     <p>Hello, optimized prices!</p>
-    <p>
-      Monthly: <span id="monthly"></span>
-    </p>
-    <p>
-      Annual: <span id="annual"></span>
-    </p>
-    <p>
-      Enter a 2-letter <a href="https://bit.ly/3m5fAfo">country code</a>
-      to simulate a different location.
-    </p>
-    <input id="country" type="text" minlength="2" maxlength="2" size="2">
+    <section>
+      <h2>Monthly</h2>
+      <p class="monthly__price"></p>
+      <button class="monthly__subscribe">Subscribe</button>
+    </section>
+    <section>
+      <h2>Annual</h2>
+      <p class="annual__price"></p>
+      <button class="annual__subscribe">Sign up</button>
+    </section>
     <script src="/index.js" async></script>
   </body>
 </html>

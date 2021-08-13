@@ -13,8 +13,8 @@
   const ipData = await ipResponse.json();
   const ip = ipData.query;
   updatePrice(ip, ipData.countryCode);
-  document.querySelector('#country').addEventListener('input', event => {
-    if (event.target.value.length !== 2) return;
-    updatePrice(ip, event.target.value);
-  });
+  // document.querySelector('#country').addEventListener('input', event => {
+  //  if (event.target.value.length !== 2) return;
+  //  updatePrice(ip, event.target.value);
+  // });
 })();
