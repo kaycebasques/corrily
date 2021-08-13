@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 
-app.get('/', async (request, response) => {
+app.get('/api/price', async (request, response) => {
+  const uid = request.query.uid;
+  const country = request.query.country;
+  const products = request.query.products.split(',');
   const result = await axios({
     method: 'post',
     headers: {
@@ -17,12 +20,12 @@ app.get('/', async (request, response) => {
       ],
       'user_id': 'kayce'
     },
-    // url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
-    url: 'https://client.corrily.com/v1/prices'
+    // TODO: Hardcode to https://client.corrily.com/v1/prices when finished
+    url: process.env.URL
   });
   response.json(result.data);
 });
 
 app.listen(8080, () => {
-  console.log(process.API_KEY);
+  console.log('https://corrily.glitch.me');
 });
