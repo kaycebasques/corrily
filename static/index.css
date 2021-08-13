@@ -1,3 +1,29 @@
-.monthly__price--unready, .annual__price--unready {
+.annual {
+  grid-area: annual;
+  place-self: center;
+}
+
+.annual__price--unready {
   opacity: 0;
+}
+
+main {
+  display: grid;
+  grid-template-areas:
+      "tagline tagline"
+      "monthly annual";
+}
+
+.monthly {
+  grid-area: monthly;
+  place-self: center;
+}
+
+.monthly__price--unready {
+  opacity: 0;
+}
+
+.tagline {
+  grid-area: tagline;
+  place-self: center;
 }
