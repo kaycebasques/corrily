@@ -2,9 +2,10 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 
+app.use(express.static('static'));
+
 app.get('/api/price', async (request, response) => {
-  const uid = request.query.uid;
-  const country = request.query.country;
+  const {user_id, country} = request.query;
   const products = request.query.products.split(',');
   const result = await axios({
     method: 'post',
@@ -13,12 +14,9 @@ app.get('/api/price', async (request, response) => {
       api_key: process.env.API_KEY
     },
     data: {
-      products: ['monthly'],
-      country: 'BR',
-      integrations: [
-        'stripe'
-      ],
-      'user_id': 'kayce'
+      user_id,
+      products,
+      country
     },
     // TODO: Hardcode to https://client.corrily.com/v1/prices when finished
     url: process.env.URL
@@ -27,5 +25,5 @@ app.get('/api/price', async (request, response) => {
 });
 
 app.listen(8080, () => {
-  console.log('https://corrily.glitch.me');
+  console.info('App is running');
 });
