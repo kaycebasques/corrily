@@ -6,7 +6,7 @@
   const priceResponse = await fetch(priceUrl);
   const priceData = await priceResponse.json();
   document.querySelector('#monthly').textContent =
-      `Monthly: ${priceData.currency_symbol}${priceData.products.monthly.price} ${priceData.currency}`;
+      `${priceData.currency_symbol}${priceData.products.monthly.price} ${priceData.currency}`;
   document.querySelector('#annual').textContent =
-      `Annual: ${priceData.currency_symbol}${priceData.products.annual.price} ${priceData.currency}`;
+      `${priceData.currency_symbol}${priceData.products.annual.price} ${priceData.currency}`;
 })();
