@@ -75,40 +75,44 @@ app.get('/', async (request, response) => {
   response.send(nunjucks.render('index.html', renderData));
 });
 
-app.post("/webhook", async (request, response) => {
-  let data;
-  let eventType;
-  const webhookSecret = {{'STRIPE_WEBHOOK_SECRET'}}
-  if (webhookSecret) {
-    let event;
-    let signature = request.headers["stripe-signature"];
-    try {
-      event = stripe.webhooks.constructEvent(
-        request.body,
-        signature,
-        webhookSecret
-      );
-    } catch (err) {
-      console.log(`⚠️  Webhook signature verification failed.`);
-      return response.sendStatus(400);
-    }
-    data = event.data;
-    eventType = event.type;
-  } else {
-    data = request.body.data;
-    eventType = request.body.type;
-  }
-  switch (eventType) {
-      case 'checkout.session.completed':
-        break;
-      case 'invoice.paid':
-        break;
-      case 'invoice.payment_failed':
-        break;
-      default:
-    }
-  response.sendStatus(200);
-});
+// https://dashboard.stripe.com/test/webhooks/we_1JOPeTEtdtsaW3xOISBabOZK
+// TODO: Finish the webhook implementation
+// https://stripe.com/docs/billing/subscriptions/checkout#provision-and-monitor
+// (The webhook has been set up)
+// app.post("/webhook", async (request, response) => {
+//   let data;
+//   let eventType;
+//   const webhookSecret = process.env.WEBHOOK;
+//   if (webhookSecret) {
+//     let event;
+//     let signature = request.headers["stripe-signature"];
+//     try {
+//       event = stripe.webhooks.constructEvent(
+//         request.body,
+//         signature,
+//         webhookSecret
+//       );
+//     } catch (err) {
+//       console.log(`⚠️  Webhook signature verification failed.`);
+//       return response.sendStatus(400);
+//     }
+//     data = event.data;
+//     eventType = event.type;
+//   } else {
+//     data = request.body.data;
+//     eventType = request.body.type;
+//   }
+//   switch (eventType) {
+//       case 'checkout.session.completed':
+//         break;
+//       case 'invoice.paid':
+//         break;
+//       case 'invoice.payment_failed':
+//         break;
+//       default:
+//     }
+//   response.sendStatus(200);
+// });
 
 
 app.listen(8080, () => {
