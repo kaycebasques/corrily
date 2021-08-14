@@ -2,20 +2,20 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Hello, optimized prices!</title>
+    <title>Corrily demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/index.css" rel="stylesheet">
   </head>
   <body>
     <main>
-      <h1 class="tagline">Hello, optimized prices!</h1>
-      <form class="monthly">
+      <h1 class="tagline">Corrily demo</h1>
+      <form class="monthly" action="/subscribe" method="POST">
         <h2>Monthly</h2>
         <p class="monthly__price monthly__price--unready">...</p>
         <input type="hidden" name="price-id" value="price_1JOBEaEtdtsaW3xOaZIBIs8l">
         <input type="submit" class="monthly__subscribe" value="Subscribe">
       </form>
-      <form class="annual" action=>
+      <form class="annual" action="/subscribe" method="POST">
         <h2>Annual</h2>
         <p class="annual__price annual__price--unready">...</p>
         <input type="hidden" name="price-id" value="price_1JOBEaEtdtsaW3xO3EWmDewD">
