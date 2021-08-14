@@ -42,6 +42,7 @@ app.post('/subscribe', async (request, response) => {
 app.get('/success', async (request, response) => {
   // TODO: https://stripe.com/docs/testing#cards
   // TODO: Notify Corrily of the completed subscription?
+  response.send('/success');
 });
 
 app.get('/cancel', async (request, response) => {
