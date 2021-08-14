@@ -1,7 +1,7 @@
 (async () => {
-  async function updatePrice(ip, countryCode) {
-    const priceUrl = 
-        `/api/price?ip=${ip}&products=annual,monthly&country=${countryCode}`;
+  async function updatePrice() {
+    const ip = document.querySelector('.monthly input[name="ip"]').value;
+    const priceUrl = `/api/price?ip=${ip}&products=annual,monthly`;
     const priceResponse = await fetch(priceUrl);
     const priceData = await priceResponse.json();
     const monthlyDisplayPrice = document.querySelector('.monthly__price')
@@ -13,10 +13,5 @@
         `${priceData.currency_symbol}${priceData.products.annual.price} ${priceData.currency}`;
     annualDisplayPrice.classList.remove('annual__price--unready');
   }
-  const ipResponse = await fetch('https://extreme-ip-lookup.com/json/');
-  const ipData = await ipResponse.json();
-  const ip = ipData.query;
-  document.querySelector('.monthly input[name="ip"]').value = ip;
-  document.querySelector('.annual input[name="ip"]').value = ip;
-  await updatePrice(ip, ipData.countryCode);
+  // await updatePrice();
 })();

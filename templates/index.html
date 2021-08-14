@@ -11,7 +11,7 @@
       <h1 class="tagline">Corrily demo</h1>
       <form class="monthly" action="/subscribe" method="POST">
         <h2>Monthly</h2>
-        <p class="monthly__price monthly__price--unready">...</p>
+        <p class="monthly__price">{{ monthly }}</p>
         <input type="hidden" name="id" value="price_1JOBEaEtdtsaW3xOaZIBIs8l">
         <input type="hidden" name="ip" value="{{ ip }}">
         <input type="hidden" name="interval" value="month">
@@ -19,7 +19,7 @@
       </form>
       <form class="annual" action="/subscribe" method="POST">
         <h2>Annual</h2>
-        <p class="annual__price annual__price--unready">...</p>
+        <p class="annual__price">{{ annual }}</p>
         <input type="hidden" name="id" value="price_1JOBEaEtdtsaW3xO3EWmDewD">
         <input type="hidden" name="ip" value="{{ ip }}">
         <input type="hidden" name="interval" value="year">

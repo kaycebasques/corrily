@@ -4,7 +4,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const stripe = require('stripe')(process.env.STRIPE);
 const nunjucks = require('nunjucks');
-let data = {};
+let sessionData = {};
 
 nunjucks.configure('templates', {
   autoescape: false
@@ -38,13 +38,6 @@ app.post('/subscribe', async (request, response) => {
 
 app.get('/', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
-  const data = {ip};
-  response.send(nunjucks.render('index.html', data));
-});
-
-app.get('/api/price', async (request, response) => {
-  const {ip, country} = request.query;
-  const products = request.query.products.split(',');
   const result = await axios({
     method: 'post',
     headers: {
@@ -52,16 +45,42 @@ app.get('/api/price', async (request, response) => {
       api_key: process.env.CORRILY
     },
     data: {
-      ip,
-      products,
-      country
+      products: ['monthly', 'annual'],
+      ip
     },
     // TODO: Hardcode to https://client.corrily.com/v1/prices when finished
     url: process.env.URL
   });
-  data[ip] = result.data;
-  response.json(result.data);
+  const priceData = result.data;
+  sessionData[ip] = priceData;
+  const renderData = {
+    monthly: `${priceData.currency_symbol}${priceData.products.monthly.price} ${priceData.currency}`,
+    annual: `${priceData.currency_symbol}${priceData.products.annual.price} ${priceData.currency}`,
+    ip
+  };
+  response.send(nunjucks.render('index.html', renderData));
 });
+
+// app.get('/api/price', async (request, response) => {
+//   const {ip, country} = request.query;
+//   const products = request.query.products.split(',');
+//   const result = await axios({
+//     method: 'post',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       api_key: process.env.CORRILY
+//     },
+//     data: {
+//       ip,
+//       products,
+//       country
+//     },
+//     // TODO: Hardcode to https://client.corrily.com/v1/prices when finished
+//     url: process.env.URL
+//   });
+//   data[ip] = result.data;
+//   response.json(result.data);
+// });
 
 app.listen(8080, () => {
   console.info('App is running');
