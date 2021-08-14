@@ -38,6 +38,14 @@ app.post('/subscribe', async (request, response) => {
   response.redirect(session.url);
 });
 
+app.get('/success', async (request, response) => {
+  // TODO: https://stripe.com/docs/testing#cards
+});
+
+app.get('/cancel', async (request, response) => {
+  
+});
+
 app.get('/', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const result = await axios({
