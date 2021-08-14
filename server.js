@@ -15,6 +15,7 @@ app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
   const {ip, id} = request.body;
+  console.log(sessionData[ip].products[id].integrations.stripe);
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -23,7 +24,7 @@ app.post('/subscribe', async (request, response) => {
         quantity: 1,
         price_data: {
           product: 'prod_K2Fkw36WcU2GXi',
-          unit_amount: sessionData[ip].products[id].price,
+          unit_amount: sessionData[ip].products[id].integrations.stripe.amount,
           currency: sessionData[ip].currency,
           recurring: {
             interval: id === 'monthly' ? 'month' : 'year'
@@ -53,10 +54,11 @@ app.get('/', async (request, response) => {
     url: process.env.URL
   });
   const priceData = result.data;
+  console.log(priceData.products.annual.integrations.stripe);
   sessionData[ip] = priceData;
   const renderData = {
-    monthly: `${priceData.currency_symbol}${priceData.products.monthly.price} ${priceData.currency}`,
-    annual: `${priceData.currency_symbol}${priceData.products.annual.price} ${priceData.currency}`,
+    monthly: priceData.products.monthly.display.price,
+    annual: priceData.products.annual.display.price,
     ip
   };
   response.send(nunjucks.render('index.html', renderData));
