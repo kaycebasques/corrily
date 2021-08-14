@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
-  response.json(request.body);
+  response.redirect('https://google.com');
 });
 
 app.get('/api/price', async (request, response) => {
@@ -29,6 +29,7 @@ app.get('/api/price', async (request, response) => {
     url: process.env.URL
   });
   data[ip] = result.data;
+  console.log(data);
   response.json(result.data);
 });
 

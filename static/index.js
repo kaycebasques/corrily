@@ -4,14 +4,18 @@
         `/api/price?ip=${ipData.query}&products=annual,monthly&country=${ipData.countryCode}`;
     const priceResponse = await fetch(priceUrl);
     const priceData = await priceResponse.json();
-    const monthlyPrice = document.querySelector('.monthly__price')
-    monthlyPrice.textContent =
+    const monthlyDisplayPrice = document.querySelector('.monthly__price')
+    monthlyDisplayPrice.textContent =
         `${priceData.currency_symbol}${priceData.products.monthly.price} ${priceData.currency}`;
-    monthlyPrice.classList.remove('monthly__price--unready');
-    const  annualPrice = document.querySelector('.annual__price')
-    annualPrice.textContent =
+    monthlyDisplayPrice.classList.remove('monthly__price--unready');
+    document.querySelector('.monthly input[name="price"]').value = priceData.products.monthly.price;
+    document.querySelector('.monthly input[name="currency"]').value = priceData.currency;
+    const  annualDisplayPrice = document.querySelector('.annual__price')
+    annualDisplayPrice.textContent =
         `${priceData.currency_symbol}${priceData.products.annual.price} ${priceData.currency}`;
-    annualPrice.classList.remove('annual__price--unready');
+    annualDisplayPrice.classList.remove('annual__price--unready');
+    document.querySelector('.annual input[name="price"]').value = priceData.products.annual.price;
+    document.querySelector('.annual input[name="currency"]').value = priceData.currency;
   }
   const ipResponse = await fetch('https://extreme-ip-lookup.com/json/');
   const ipData = await ipResponse.json();
