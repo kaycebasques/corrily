@@ -2,13 +2,26 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 const bodyParser = require('body-parser');
+const stripe = require('stripe')(process.env.STRIPE);
 let data = {};
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
-  response.redirect('https://google.com');
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price: request.body.id,
+        quantity: 1
+      }
+    ],
+    success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
+    cancel_url: 'https://example.com/canceled'
+  });
+  response.redirect(session.url);
 });
 
 app.get('/api/price', async (request, response) => {
@@ -18,7 +31,7 @@ app.get('/api/price', async (request, response) => {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
-      api_key: process.env.API_KEY
+      api_key: process.env.CORRILY
     },
     data: {
       ip,
@@ -29,7 +42,6 @@ app.get('/api/price', async (request, response) => {
     url: process.env.URL
   });
   data[ip] = result.data;
-  console.log(data);
   response.json(result.data);
 });
 

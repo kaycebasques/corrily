@@ -20,5 +20,7 @@
   const ipResponse = await fetch('https://extreme-ip-lookup.com/json/');
   const ipData = await ipResponse.json();
   const ip = ipData.query;
+  document.querySelector('.monthly input[name="ip"]').value = ip;
+  document.querySelector('.annual input[name="ip"]').value = ip;
   await updatePrice(ip, ipData.countryCode);
 })();
