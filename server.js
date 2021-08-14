@@ -15,7 +15,17 @@ app.post('/subscribe', async (request, response) => {
     line_items: [
       {
         price: request.body.id,
-        quantity: 1
+        quantity: 1,
+        'price_data': {
+          'unit_amount': response_dict['products']['monthly_plan']['integrations']['stripe']['amount'],
+          'currency': response_dict['products']['monthly_plan']['display']['stripe']['currency'],
+          'product_data': {
+            'name': 'Stubborn Attachments',
+          },
+          'recurring': {
+            'interval': "month"
+          }
+        },
       }
     ],
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
