@@ -3,7 +3,12 @@ const app = express();
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const stripe = require('stripe')(process.env.STRIPE);
+const nunjucks = require('nunjucks');
 let data = {};
+
+nunjucks.configure('templates', {
+  autoescape: false
+});
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
@@ -36,7 +41,7 @@ app.get('/ip', async (request, response) => {
   response.send(ip);
 });
 
-app.get('/api/price', async (request, response) => {
+app.get('/', async (request, response) => {
   const {ip, country} = request.query;
   const products = request.query.products.split(',');
   const result = await axios({
