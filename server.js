@@ -45,7 +45,7 @@ app.get('/success', async (request, response) => {
 });
 
 app.get('/cancel', async (request, response) => {
-  
+  response.send('cancel!');
 });
 
 app.get('/', async (request, response) => {
