@@ -16,20 +16,17 @@ app.post('/subscribe', async (request, response) => {
       {
         price: request.body.id,
         quantity: 1,
-        'price_data': {
-          'unit_amount': response_dict['products']['monthly_plan']['integrations']['stripe']['amount'],
-          'currency': response_dict['products']['monthly_plan']['display']['stripe']['currency'],
-          'product_data': {
-            'name': 'Stubborn Attachments',
-          },
-          'recurring': {
-            'interval': "month"
+        price_data: {
+          unit_amount: request.body.price,
+          currency: request.body.currency,
+          recurring: {
+            interval: request.body.interval
           }
-        },
+        }
       }
     ],
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
-    cancel_url: 'https://example.com/canceled'
+    cancel_url: 'https://corrily.glitch.me/cancel'
   });
   response.redirect(session.url);
 });
