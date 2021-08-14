@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-const session = require('express-session');
+let data = {};
 
 app.use(express.static('static'));
 
@@ -22,6 +22,7 @@ app.get('/api/price', async (request, response) => {
     // TODO: Hardcode to https://client.corrily.com/v1/prices when finished
     url: process.env.URL
   });
+  data[ip] = result.data;
   response.json(result.data);
 });
 
