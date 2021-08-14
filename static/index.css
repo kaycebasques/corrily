@@ -3,10 +3,6 @@
   place-self: center;
 }
 
-.annual__price--unready {
-  opacity: 0;
-}
-
 main {
   display: grid;
   grid-template-areas:
@@ -17,10 +13,6 @@ main {
 .monthly {
   grid-area: monthly;
   place-self: center;
-}
-
-.monthly__price--unready {
-  opacity: 0;
 }
 
 .tagline {
