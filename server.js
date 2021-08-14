@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
+  // TODO: Notify Corrily of the pending subscription?
   const {ip, id} = request.body;
   console.log(sessionData[ip].products[id].integrations.stripe);
   const session = await stripe.checkout.sessions.create({
@@ -40,6 +41,7 @@ app.post('/subscribe', async (request, response) => {
 
 app.get('/success', async (request, response) => {
   // TODO: https://stripe.com/docs/testing#cards
+  // TODO: Notify Corrily of the completed subscription?
 });
 
 app.get('/cancel', async (request, response) => {
