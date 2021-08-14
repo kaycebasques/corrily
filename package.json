@@ -1,5 +1,5 @@
 {
-  "name": "hello-node",
+  "name": "corrily",
   "version": "0.0.1",
   "scripts": {
     "start": "node server.js"
@@ -8,7 +8,6 @@
     "express": "^4.17.1",
     "axios": "^0.21.1",
     "stripe": "^8.168.0",
-    "express-session": "^1.17.2",
     "body-parser": "^1.19.0",
     "nunjucks": "^3.2.3"
   },

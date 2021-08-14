@@ -14,8 +14,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
-  const ip = request.body.ip;
-  const productId = request.body.interval === 'month' ? 'monthly' : 'year';
+  const {ip, id} = request.body;
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -23,11 +22,11 @@ app.post('/subscribe', async (request, response) => {
       {
         quantity: 1,
         price_data: {
-          product: request.body.id,
-          unit_amount: sessionData[ip].products[productId].price,
+          product: 'prod_K2Fkw36WcU2GXi',
+          unit_amount: sessionData[ip].products[id].price,
           currency: sessionData[ip].currency,
           recurring: {
-            interval: request.body.interval
+            interval: id === 'monthly' ? 'month' : 'year'
           }
         }
       }

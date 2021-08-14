@@ -12,17 +12,15 @@
       <form class="monthly" action="/subscribe" method="POST">
         <h2>Monthly</h2>
         <p class="monthly__price">{{ monthly }}</p>
-        <input type="hidden" name="id" value="price_1JOBEaEtdtsaW3xOaZIBIs8l">
         <input type="hidden" name="ip" value="{{ ip }}">
-        <input type="hidden" name="interval" value="month">
+        <input type="hidden" name="id" value="monthly">
         <input type="submit" class="monthly__subscribe" value="Subscribe">
       </form>
       <form class="annual" action="/subscribe" method="POST">
         <h2>Annual</h2>
         <p class="annual__price">{{ annual }}</p>
-        <input type="hidden" name="id" value="price_1JOBEaEtdtsaW3xO3EWmDewD">
         <input type="hidden" name="ip" value="{{ ip }}">
-        <input type="hidden" name="interval" value="year">
+        <input type="hidden" name="id" value="annual">
         <input type="submit" class="annual__subscribe" value="Subscribe">
       </form>
     </main>
