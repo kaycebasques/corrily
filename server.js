@@ -1,9 +1,15 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
+const bodyParser = require('body-parser');
 let data = {};
 
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
+
+app.post('/subscribe', async (request, response) => {
+  response.json(request.body);
+});
 
 app.get('/api/price', async (request, response) => {
   const {ip, country} = request.query;

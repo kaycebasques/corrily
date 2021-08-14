@@ -8,7 +8,8 @@
     "express": "^4.17.1",
     "axios": "^0.21.1",
     "stripe": "^8.168.0",
-    "express-session": "^1.17.2"
+    "express-session": "^1.17.2",
+    "body-parser": "^1.19.0"
   },
   "engines": {
     "node": "12.x"

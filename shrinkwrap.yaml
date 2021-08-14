@@ -1,5 +1,6 @@
 dependencies:
   axios: 0.21.1
+  body-parser: 1.19.0
   express: 4.17.1
   express-session: 1.17.2
   stripe: 8.169.0
@@ -526,6 +527,7 @@ shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
   axios: ^0.21.1
+  body-parser: ^1.19.0
   express: ^4.17.1
   express-session: ^1.17.2
   stripe: ^8.168.0
