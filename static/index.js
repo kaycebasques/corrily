@@ -16,5 +16,13 @@
   const ipResponse = await fetch('https://extreme-ip-lookup.com/json/');
   const ipData = await ipResponse.json();
   const ip = ipData.query;
-  updatePrice(ip, ipData.countryCode);
+  await updatePrice(ip, ipData.countryCode);
+  const monthly = document.querySelector('.monthly__subscribe');
+  monthly.addEventListener('click', () => {
+    
+  });
+  const annual = document.querySelector('.annual__subscribe');
+  annual.addEventListener('click', () => {
+    
+  });
 })();
