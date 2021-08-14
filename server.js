@@ -36,12 +36,13 @@ app.post('/subscribe', async (request, response) => {
   response.redirect(session.url);
 });
 
-app.get('/ip', async (request, response) => {
+app.get('/', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
-  response.send(ip);
+  const data = {ip};
+  response.send(nunjucks.render('index.html', data));
 });
 
-app.get('/', async (request, response) => {
+app.get('/api/price', async (request, response) => {
   const {ip, country} = request.query;
   const products = request.query.products.split(',');
   const result = await axios({
