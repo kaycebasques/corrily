@@ -14,7 +14,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
-  // TODO: Notify Corrily of the pending subscription?
   const {ip, id} = request.body;
   console.log(sessionData[ip].products[id].integrations.stripe);
   const session = await stripe.checkout.sessions.create({
@@ -41,7 +40,6 @@ app.post('/subscribe', async (request, response) => {
 
 app.get('/success', async (request, response) => {
   // TODO: https://stripe.com/docs/testing#cards
-  // TODO: Notify Corrily of the completed subscription?
   response.send('/success');
 });
 
@@ -79,40 +77,26 @@ app.get('/', async (request, response) => {
 // TODO: Finish the webhook implementation
 // https://stripe.com/docs/billing/subscriptions/checkout#provision-and-monitor
 // (The webhook has been set up)
-// app.post("/webhook", async (request, response) => {
-//   let data;
-//   let eventType;
-//   const webhookSecret = process.env.WEBHOOK;
-//   if (webhookSecret) {
-//     let event;
-//     let signature = request.headers["stripe-signature"];
-//     try {
-//       event = stripe.webhooks.constructEvent(
-//         request.body,
-//         signature,
-//         webhookSecret
-//       );
-//     } catch (err) {
-//       console.log(`⚠️  Webhook signature verification failed.`);
-//       return response.sendStatus(400);
-//     }
-//     data = event.data;
-//     eventType = event.type;
-//   } else {
-//     data = request.body.data;
-//     eventType = request.body.type;
-//   }
-//   switch (eventType) {
-//       case 'checkout.session.completed':
-//         break;
-//       case 'invoice.paid':
-//         break;
-//       case 'invoice.payment_failed':
-//         break;
-//       default:
-//     }
-//   response.sendStatus(200);
-// });
+app.post('/webhook', async (request, response) => {
+  let data;
+  let eventType;
+  const webhookSecret = process.env.WEBHOOK;
+  if (!webhookSecret) return response.sendStatus(500);
+  let event;
+  const signature = request.headers['stripe-signature'];
+  try {
+    event = stripe.webhooks.constructEvent(request.body, signature,
+      webhookSecret
+    );
+  } catch (err) {
+    console.log(`⚠️  Webhook signature verification failed.`);
+    return response.sendStatus(400);
+  }
+  data = event.data;
+  eventType = event.type;
+  console.log(eventType);
+  response.sendStatus(200);
+});
 
 
 app.listen(8080, () => {
