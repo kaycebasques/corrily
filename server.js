@@ -75,11 +75,11 @@ app.post('/webhook', async (request, response) => {
     console.error('⚠️ Webhook signature verification failed.');
     return response.sendStatus(400);
   }
-  console.log(event.data.object);
+  const data = event.data.object;
   // TODO: Note this assumption.
-  const item = event.data.items.data[0];
+  const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
-  switch (item.status) {
+  switch (data.status) {
     case 'incomplete':
     case 'incomplete_expired':
       status = 'pending';
@@ -97,29 +97,35 @@ app.post('/webhook', async (request, response) => {
       break;
   }
   const eventType = event.type;
+  let r;
   switch (eventType) {
     // https://stripe.com/docs/api/subscriptions/object
     case 'customer.subscription.created':
-      const r = await axios({
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          api_key: process.env.CORRILY
-        },
-        data: {
-          amount: item.price.unit_amount,
-          created: item.created,
-          currency: item.price.currency,
-          origin: 'stripe',
-          // TODO: Subscription ID or subscription item ID?
-          // https://stripe.com/docs/api/subscriptions/object
-          origin_id: item.id,
-          product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
-          status,
-          user_id: event.data.customer
-        },
-        url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
-      });
+      try {
+        r = await axios({
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            api_key: process.env.CORRILY
+          },
+          data: {
+            amount: item.price.unit_amount,
+            created: item.created,
+            currency: item.price.currency,
+            origin: 'stripe',
+            // TODO: Subscription ID or subscription item ID?
+            // https://stripe.com/docs/api/subscriptions/object
+            origin_id: item.id,
+            product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
+            status,
+            user_id: data.customer
+          },
+          url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      console.log(r.data);
       break;
     case 'customer.subscription.updated':
       break;
