@@ -13,7 +13,7 @@ nunjucks.configure('templates', {
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static', {
-  
+  extensions: ['html']
 }));
 
 app.get('/', async (request, response) => {
@@ -65,10 +65,6 @@ app.post('/subscribe', async (request, response) => {
   response.redirect(session.url);
 });
 
-// https://dashboard.stripe.com/test/webhooks/we_1JOPeTEtdtsaW3xOISBabOZK
-// TODO: Finish the webhook implementation
-// https://stripe.com/docs/billing/subscriptions/checkout#provision-and-monitor
-// (The webhook has been set up)
 app.post('/webhook', async (request, response) => {
   let data;
   let eventType;
@@ -88,7 +84,6 @@ app.post('/webhook', async (request, response) => {
   console.log({data, eventType});
   return response.sendStatus(200);
 });
-
 
 app.listen(8080, () => {
   console.info('https://corrily.glitch.me is running');
