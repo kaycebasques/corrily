@@ -15,7 +15,6 @@ app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
   const {ip, id} = request.body;
-  console.log(sessionData[ip].products[id].integrations.stripe);
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -63,7 +62,6 @@ app.get('/', async (request, response) => {
     url: process.env.URL
   });
   const priceData = result.data;
-  console.log(priceData.products.annual.integrations.stripe);
   sessionData[ip] = priceData;
   const renderData = {
     monthly: priceData.products.monthly.display.price,
@@ -85,20 +83,19 @@ app.post('/webhook', async (request, response) => {
   let event;
   const signature = request.headers['stripe-signature'];
   try {
-    event = stripe.webhooks.constructEvent(request.body, signature,
-      webhookSecret
-    );
-  } catch (err) {
-    console.log(`⚠️  Webhook signature verification failed.`);
+    event = stripe.webhooks.constructEvent(request.body, signature, webhookSecret);
+  } catch (error) {
+    console.error('⚠️ Webhook signature verification failed.');
+    console.log({error});
     return response.sendStatus(400);
   }
   data = event.data;
   eventType = event.type;
-  console.log(eventType);
-  response.sendStatus(200);
+  console.log({data, eventType});
+  return response.sendStatus(200);
 });
 
 
 app.listen(8080, () => {
-  console.info('App is running');
+  console.info('https://corrily.glitch.me is running');
 });
