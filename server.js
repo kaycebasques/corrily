@@ -10,7 +10,7 @@ nunjucks.configure('templates', {
   autoescape: false
 });
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('static'));
 
 app.post('/subscribe', async (request, response) => {
@@ -78,15 +78,16 @@ app.get('/', async (request, response) => {
 app.post('/webhook', async (request, response) => {
   let data;
   let eventType;
-  const webhookSecret = process.env.WEBHOOK;
-  if (!webhookSecret) return response.sendStatus(500);
+  const secret = process.env.WEBHOOK_SECRET;
+  if (!secret) return response.sendStatus(500);
   let event;
   const signature = request.headers['stripe-signature'];
+  console.log({body: request.body});
   try {
-    event = stripe.webhooks.constructEvent(request.body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(request.body, signature, secret);
   } catch (error) {
     console.error('⚠️ Webhook signature verification failed.');
-    console.log({error});
+    console.log(error.details);
     return response.sendStatus(400);
   }
   data = event.data;
