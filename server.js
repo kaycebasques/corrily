@@ -28,8 +28,7 @@ app.get('/', async (request, response) => {
       products: ['monthly', 'annual'],
       ip
     },
-    // TODO: Hardcode to https://client.corrily.com/v1/prices when finished
-    url: process.env.URL
+    url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
   const priceData = result.data;
   sessionData[ip] = priceData;
@@ -66,8 +65,6 @@ app.post('/subscribe', async (request, response) => {
 });
 
 app.post('/webhook', async (request, response) => {
-  let data;
-  let eventType;
   const secret = process.env.WEBHOOK_SECRET;
   if (!secret) return response.sendStatus(500);
   let event;
@@ -78,11 +75,29 @@ app.post('/webhook', async (request, response) => {
     console.error('⚠️ Webhook signature verification failed.');
     return response.sendStatus(400);
   }
-  data = event.data;
-  eventType = event.type;
-  console.log({eventType});
+  const data = event.data;
+  const eventType = event.type;
   switch (eventType) {
-    case 
+    // https://stripe.com/docs/api/subscriptions/object
+    case 'customer.subscription.created':
+      await axios({
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          api_key: process.env.CORRILY
+        },
+        data: {
+          amount: data.items.data[0].price.unit_amount,
+          created: data.items.data[0].price.unit_amount
+        },
+        url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
+      });
+      break;
+    case 'customer.subscription.updated':
+      break;
+    // https://stripe.com/docs/api/invoices/object
+    case 'invoice.paid':
+      break;
   }
   return response.sendStatus(200);
 });
