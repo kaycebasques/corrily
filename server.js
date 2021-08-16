@@ -38,7 +38,7 @@ app.get('/', async (request, response) => {
     annual: priceData.products.annual.display.price,
     ip
   };
-  response.send(nunjucks.render('index.html', renderData));
+  return response.send(nunjucks.render('index.html', renderData));
 });
 
 app.post('/subscribe', async (request, response) => {
@@ -62,7 +62,7 @@ app.post('/subscribe', async (request, response) => {
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
     cancel_url: 'https://corrily.glitch.me/cancel'
   });
-  response.redirect(session.url);
+  return response.redirect(session.url);
 });
 
 app.post('/webhook', async (request, response) => {
@@ -76,12 +76,14 @@ app.post('/webhook', async (request, response) => {
     event = stripe.webhooks.constructEvent(request.body, signature, secret);
   } catch (error) {
     console.error('⚠️ Webhook signature verification failed.');
-    console.log(error);
     return response.sendStatus(400);
   }
   data = event.data;
   eventType = event.type;
-  console.log({data, eventType});
+  console.log({eventType});
+  switch (eventType) {
+    case 
+  }
   return response.sendStatus(200);
 });
 
