@@ -77,6 +77,24 @@ app.post('/webhook', async (request, response) => {
   }
   // TODO: Note this assumption.
   const item = event.data.items.data[0];
+  let status;
+  switch (item.status) {
+    case 'incomplete':
+    case 'incomplete_expired':
+      status = 'pending';
+      break;
+    case 'trialing':
+      status = 'trialing';
+      break;
+    case 'active':
+    case 'past_due':
+      status = 'active';
+      break;
+    case 'canceled':
+    case 'unpaid':
+      status = 'canceled';
+      break;
+  }
   const eventType = event.type;
   switch (eventType) {
     // https://stripe.com/docs/api/subscriptions/object
@@ -95,6 +113,9 @@ app.post('/webhook', async (request, response) => {
           // TODO: Subscription ID or subscription item ID?
           // https://stripe.com/docs/api/subscriptions/object
           origin_id: item.id,
+          product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
+          status,
+          user_id: event.
         },
         url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
       });
