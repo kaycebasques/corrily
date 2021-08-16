@@ -12,40 +12,9 @@ nunjucks.configure('templates', {
 
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(express.static('static'));
-
-app.post('/subscribe', async (request, response) => {
-  const {ip, id} = request.body;
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          product: 'prod_K2Fkw36WcU2GXi',
-          unit_amount: sessionData[ip].products[id].integrations.stripe.amount,
-          currency: sessionData[ip].currency,
-          recurring: {
-            interval: id === 'monthly' ? 'month' : 'year'
-          }
-        }
-      }
-    ],
-    success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
-    cancel_url: 'https://corrily.glitch.me/cancel'
-  });
-  response.redirect(session.url);
-});
-
-app.get('/success', async (request, response) => {
-  // TODO: https://stripe.com/docs/testing#cards
-  response.send('/success');
-});
-
-app.get('/cancel', async (request, response) => {
-  response.send('/cancel');
-});
+app.use(express.static('static', {
+  
+}));
 
 app.get('/', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
@@ -70,6 +39,30 @@ app.get('/', async (request, response) => {
     ip
   };
   response.send(nunjucks.render('index.html', renderData));
+});
+
+app.post('/subscribe', async (request, response) => {
+  const {ip, id} = request.body;
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          product: 'prod_K2Fkw36WcU2GXi',
+          unit_amount: sessionData[ip].products[id].integrations.stripe.amount,
+          currency: sessionData[ip].currency,
+          recurring: {
+            interval: id === 'monthly' ? 'month' : 'year'
+          }
+        }
+      }
+    ],
+    success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
+    cancel_url: 'https://corrily.glitch.me/cancel'
+  });
+  response.redirect(session.url);
 });
 
 // https://dashboard.stripe.com/test/webhooks/we_1JOPeTEtdtsaW3xOISBabOZK
