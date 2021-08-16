@@ -75,6 +75,7 @@ app.post('/webhook', async (request, response) => {
     console.error('⚠️ Webhook signature verification failed.');
     return response.sendStatus(400);
   }
+  console.log(event.data.object);
   // TODO: Note this assumption.
   const item = event.data.items.data[0];
   let status;
@@ -99,7 +100,7 @@ app.post('/webhook', async (request, response) => {
   switch (eventType) {
     // https://stripe.com/docs/api/subscriptions/object
     case 'customer.subscription.created':
-      await axios({
+      const r = await axios({
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +116,7 @@ app.post('/webhook', async (request, response) => {
           origin_id: item.id,
           product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
           status,
-          user_id: event.
+          user_id: event.data.customer
         },
         url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
       });
