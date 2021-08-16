@@ -75,7 +75,8 @@ app.post('/webhook', async (request, response) => {
     console.error('⚠️ Webhook signature verification failed.');
     return response.sendStatus(400);
   }
-  const data = event.data;
+  // TODO: Note this assumption.
+  const item = event.data.items.data[0];
   const eventType = event.type;
   switch (eventType) {
     // https://stripe.com/docs/api/subscriptions/object
@@ -87,8 +88,13 @@ app.post('/webhook', async (request, response) => {
           api_key: process.env.CORRILY
         },
         data: {
-          amount: data.items.data[0].price.unit_amount,
-          created: data.items.data[0].price.unit_amount
+          amount: item.price.unit_amount,
+          created: item.created,
+          currency: item.price.currency,
+          origin: 'stripe',
+          // TODO: Subscription ID or subscription item ID?
+          // https://stripe.com/docs/api/subscriptions/object
+          origin_id: item.id,
         },
         url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
       });
