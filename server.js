@@ -79,30 +79,30 @@ app.post('/webhook', async (request, response) => {
   // TODO: Note this assumption.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
-  switch (data.status) {
-    case 'incomplete':
-    case 'incomplete_expired':
-      status = 'pending';
-      break;
-    case 'trialing':
-      status = 'trialing';
-      break;
-    case 'active':
-    case 'past_due':
-      status = 'active';
-      break;
-    case 'canceled':
-    case 'unpaid':
-      status = 'canceled';
-      break;
-  }
   const eventType = event.type;
   let r;
   switch (eventType) {
     // https://stripe.com/docs/api/subscriptions/object
     case 'customer.subscription.created':
+      switch (data.status) {
+        case 'incomplete':
+        case 'incomplete_expired':
+          status = 'pending';
+          break;
+        case 'trialing':
+          status = 'trialing';
+          break;
+        case 'active':
+        case 'past_due':
+          status = 'active';
+          break;
+        case 'canceled':
+        case 'unpaid':
+          status = 'canceled';
+          break;
+      }
       try {
-        r = await axios({
+        await axios({
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ app.post('/webhook', async (request, response) => {
           data: {
             amount: item.price.unit_amount,
             created: item.created,
-            currency: item.price.currency,
+            currency: item.price.currency.toUpperCase(),
             origin: 'stripe',
             // TODO: Subscription ID or subscription item ID?
             // https://stripe.com/docs/api/subscriptions/object
@@ -125,12 +125,51 @@ app.post('/webhook', async (request, response) => {
       } catch (error) {
         console.error(error);
       }
-      console.log(r.data);
-      break;
-    case 'customer.subscription.updated':
       break;
     // https://stripe.com/docs/api/invoices/object
     case 'invoice.paid':
+      switch (data.status) {
+        case 'draft':
+        case 'open':
+          status = 'pending';
+          break;
+        case 'paid':
+          status = 'trialing';
+          break;
+        case 'active':
+        case 'past_due':
+          status = 'active';
+          break;
+        case 'canceled':
+        case 'unpaid':
+          status = 'canceled';
+          break;
+      }
+      try {
+        r = await axios({
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            api_key: process.env.CORRILY
+          },
+          data: {
+            amount: item.price.unit_amount,
+            created: item.created,
+            currency: item.price.currency.toUpperCase(),
+            origin: 'stripe',
+            // TODO: Subscription ID or subscription item ID?
+            // https://stripe.com/docs/api/subscriptions/object
+            origin_id: item.id,
+            product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
+            status,
+            user_id: data.customer
+          },
+          url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/charges'
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      console.log(r.data);
       break;
   }
   return response.sendStatus(200);
