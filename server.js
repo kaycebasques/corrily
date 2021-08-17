@@ -12,7 +12,7 @@ nunjucks.configure('templates', {
   autoescape: false
 });
 
-// 4
+// 6
 
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
@@ -173,5 +173,5 @@ app.post('/webhook', async (request, response) => {
 });
 
 app.listen(8080, () => {
-  console.info('https://corrily.glitch.me is running');
+  console.info('Running!');
 });
