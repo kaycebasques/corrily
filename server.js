@@ -4,6 +4,8 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const stripe = require('stripe')(process.env.STRIPE);
 const nunjucks = require('nunjucks');
+// For simplicity this demo stores user/session information in memory.
+// This will not work for your production app.
 let sessionData = {};
 
 nunjucks.configure('templates', {
@@ -58,9 +60,6 @@ app.post('/subscribe', async (request, response) => {
         }
       }
     ],
-    metadata: {
-      corrily_product_id: id
-    },
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
     cancel_url: 'https://corrily.glitch.me/cancel'
   });
@@ -80,7 +79,7 @@ app.post('/webhook', async (request, response) => {
   }
   const data = event.data.object;
   // In this demo we're assuming that there's only one line item.
-  // In your real application you may have more than one.
+  // In a real application you should check if you have more than one.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
@@ -116,7 +115,6 @@ app.post('/webhook', async (request, response) => {
             created: item.created,
             currency: item.price.currency.toUpperCase(),
             origin: 'stripe',
-            // TODO: Subscription ID or subscription item ID?
             origin_id: item.id,
             product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
             status,
