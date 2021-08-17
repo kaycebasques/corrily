@@ -41,7 +41,6 @@ app.get('/', async (request, response) => {
     monthly: priceData.products.monthly.display.price,
     annual: priceData.products.annual.display.price
   };
-  console.log(sessionData); // TODO
   return response.send(nunjucks.render('index.html', renderData));
 });
 
@@ -49,7 +48,6 @@ app.post('/email', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const {id} = request.body;
   sessionData[ip].id = id;
-  console.log(sessionData); // TODO
   return response.sendFile(`${__dirname}/static/email.html`);
 });
 
@@ -74,14 +72,10 @@ app.post('/subscribe', async (request, response) => {
         }
       }
     ],
-    metadata: {
-      ip
-    },
     customer_email: email,
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
     cancel_url: 'https://corrily.glitch.me/cancel'
   });
-  console.log(sessionData); // TODO
   return response.redirect(session.url);
 });
 
@@ -97,12 +91,13 @@ app.post('/webhook', async (request, response) => {
     return response.sendStatus(400);
   }
   const data = event.data.object;
-  console.log(data); // TODO
   // In this demo we're assuming that there's only one line item.
   // In a production app you should check if you have more than one.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
+  console.log(eventType); // TODO
+  console.log(data); // TODO
   switch (eventType) {
     case 'customer.subscription.created':
       switch (data.status) {
@@ -147,43 +142,45 @@ app.post('/webhook', async (request, response) => {
       }
       break;
     case 'invoice.paid':
-      // switch (data.status) {
-      //   case 'draft':
-      //   case 'open':
-      //     status = 'pending';
-      //     break;
-      //   case 'paid':
-      //     status = 'succeeded';
-      //     break;
-      //   case 'uncollectible':
-      //   case 'void':
-      //     status = 'failed';
-      //     break;
-      // }
-      // try {
-      //   r = await axios({
-      //     method: 'post',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       api_key: process.env.CORRILY
-      //     },
-      //     data: {
-      //       amount: item.price.unit_amount,
-      //       created: item.created,
-      //       currency: item.price.currency.toUpperCase(),
-      //       origin: 'stripe',
-      //       origin_id: item.id,
-      //       product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
-      //       status,
-      //       user_id: data.customer
-      //     },
-      //     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/charges'
-      //   });
-      // } catch (error) {
-      //   console.error(error);
-      //   return response.sendStatus(500);
-      // }
-      // console.log(r.data);
+      switch (data.status) {
+        case 'draft':
+        case 'open':
+          status = 'pending';
+          break;
+        case 'paid':
+          status = 'succeeded';
+          break;
+        case 'uncollectible':
+        case 'void':
+          status = 'failed';
+          break;
+      }
+      const email = data.customer_email;
+      let ip;
+      try {
+        const r = await axios({
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            api_key: process.env.CORRILY
+          },
+          data: {
+            amount: item.price.unit_amount,
+            created: item.created,
+            currency: item.price.currency.toUpperCase(),
+            origin: 'stripe',
+            origin_id: item.id,
+            product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
+            status,
+            user_id: data.customer
+          },
+          url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/charges'
+        });
+        console.log(r.data); // TODO
+      } catch (error) {
+        console.error(error);
+        return response.sendStatus(500);
+      }
       break;
   }
   return response.sendStatus(200);
