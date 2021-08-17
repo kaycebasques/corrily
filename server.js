@@ -79,13 +79,13 @@ app.post('/webhook', async (request, response) => {
     return response.sendStatus(400);
   }
   const data = event.data.object;
-  // TODO: Note this assumption.
+  // In this demo we're assuming that there's only one line item.
+  // In your real application you may have more than one.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
   let r;
   switch (eventType) {
-    // https://stripe.com/docs/api/subscriptions/object
     case 'customer.subscription.created':
       switch (data.status) {
         case 'incomplete':
@@ -117,7 +117,6 @@ app.post('/webhook', async (request, response) => {
             currency: item.price.currency.toUpperCase(),
             origin: 'stripe',
             // TODO: Subscription ID or subscription item ID?
-            // https://stripe.com/docs/api/subscriptions/object
             origin_id: item.id,
             product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
             status,
@@ -129,7 +128,6 @@ app.post('/webhook', async (request, response) => {
         console.error(error);
       }
       break;
-    // https://stripe.com/docs/api/invoices/object
     case 'invoice.paid':
       // switch (data.status) {
       //   case 'draft':
