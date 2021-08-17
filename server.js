@@ -124,6 +124,7 @@ app.post('/webhook', async (request, response) => {
         });
       } catch (error) {
         console.error(error);
+        return response.sendStatus(500);
       }
       break;
     case 'invoice.paid':
@@ -152,8 +153,6 @@ app.post('/webhook', async (request, response) => {
       //       created: item.created,
       //       currency: item.price.currency.toUpperCase(),
       //       origin: 'stripe',
-      //       // TODO: Subscription ID or subscription item ID?
-      //       // https://stripe.com/docs/api/subscriptions/object
       //       origin_id: item.id,
       //       product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
       //       status,
@@ -163,6 +162,7 @@ app.post('/webhook', async (request, response) => {
       //   });
       // } catch (error) {
       //   console.error(error);
+      //   return response.sendStatus(500);
       // }
       // console.log(r.data);
       break;
