@@ -1,3 +1,4 @@
+// v1
 const express = require('express');
 const app = express();
 const axios = require('axios');
@@ -115,28 +116,23 @@ app.post('/webhook', async (request, response) => {
   const email = data.customer_email;
   
   let r; // TODO
-  function mapStatus(status) {
-    switch (data.status) {
+  function map(status) {
+    switch (status) {
       case 'incomplete':
       case 'incomplete_expired':
-        status = 'pending';
-        break;
+        return 'pending';
       case 'trialing':
-        status = 'trialing';
-        break;
+        return 'trialing';
       case 'active':
       case 'past_due':
-        status = 'active';
-        break;
+        return 'active';
       case 'canceled':
       case 'unpaid':
-        status = 'canceled';
-        break;
+        return 'canceled';
     }
   }
   switch (eventType) {
     case 'customer.subscription.created':
-
       try {
         r = await axios({
           method: 'post',
@@ -151,7 +147,7 @@ app.post('/webhook', async (request, response) => {
             origin: 'stripe',
             origin_id: item.id,
             product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
-            status,
+            status: map(data.status),
             user_id: data.customer
           },
           url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
@@ -162,6 +158,29 @@ app.post('/webhook', async (request, response) => {
       }
       break;
     case 'customer.subscription.updated':
+      try {
+        r = await axios({
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            api_key: process.env.CORRILY_API_KEY
+          },
+          data: {
+            amount: item.price.unit_amount,
+            created: item.created,
+            currency: item.price.currency.toUpperCase(),
+            origin: 'stripe',
+            origin_id: item.id,
+            product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
+            status: map(data.status),
+            user_id: data.customer
+          },
+          url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
+        });
+      } catch (error) {
+        console.error(error);
+        return response.sendStatus(500);
+      }
       break;
     case 'invoice.paid':
       switch (data.status) {
@@ -205,8 +224,8 @@ app.post('/webhook', async (request, response) => {
   console.log({eventType}); // TODO
   if (data) console.log(data); // TODO
   else console.log('data is empty'); // TODO
-  if (r.data) console.log(r.data); // TODO
-  else console.log('r.data is empty'); // TODO
+  if (r && r.data) console.log(r.data); // TODO
+  else console.log('r or r.data is empty'); // TODO
   return response.sendStatus(200);
 });
 
