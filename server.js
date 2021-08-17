@@ -131,6 +131,12 @@ app.post('/webhook', async (request, response) => {
         return 'canceled';
     }
   }
+  async function resolve(customerId) {
+    const {email} = await stripe.customers.retrieve(customerId);
+    for (const key in sessionData) {
+      
+    }
+  }
   switch (eventType) {
     case 'customer.subscription.created':
       try {
@@ -158,6 +164,8 @@ app.post('/webhook', async (request, response) => {
       }
       break;
     case 'customer.subscription.updated':
+      // const base = 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions';
+      // const url = `${base}/${uuid}/stripe/${???}`
       try {
         r = await axios({
           method: 'post',
