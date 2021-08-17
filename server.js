@@ -41,22 +41,25 @@ app.get('/', async (request, response) => {
   const renderData = {
     monthly: priceData.products.monthly.display.price,
     annual: priceData.products.annual.display.price,
-    user_id: uuid
+    uuid: uuid
   };
   return response.send(nunjucks.render('index.html', renderData));
 });
 
 app.post('/email', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
-  const {id, uuid} = request.body;
-  sessionData[uuid].id = id;
-  return response.sendFile(`${__dirname}/static/email.html`);
+  const {product, uuid} = request.body;
+  sessionData[uuid].product = product;
+  const renderData = {
+    uuid: uuid
+  };
+  return response.send(nunjucks.render('email.html', renderData));
 });
 
 app.post('/subscribe', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const {email, uuid} = request.body;
-  const id = sessionData[uuid].id;
+  const product = sessionData[uuid].product;
   sessionData[uuid].email = email;
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -66,10 +69,10 @@ app.post('/subscribe', async (request, response) => {
         quantity: 1,
         price_data: {
           product: 'prod_K2Fkw36WcU2GXi',
-          unit_amount: sessionData[uuid].prices.products[id].integrations.stripe.amount,
+          unit_amount: sessionData[uuid].prices.products[product].integrations.stripe.amount,
           currency: sessionData[uuid].prices.currency,
           recurring: {
-            interval: id === 'monthly' ? 'month' : 'year'
+            interval: product === 'monthly' ? 'month' : 'year'
           }
         }
       }
