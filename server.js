@@ -89,6 +89,8 @@ app.post('/subscribe', async (request, response) => {
   console.log('POST /subscribe'); // TODO
   console.log('Session data'); // TODO
   console.log(sessionData); // TODO
+  console.log('Stripe session'); // TODO
+  console.log(session); // TODO
   return response.redirect(session.url);
 });
 
@@ -113,25 +115,28 @@ app.post('/webhook', async (request, response) => {
   const email = data.customer_email;
   
   let r; // TODO
+  function mapStatus(status) {
+    switch (data.status) {
+      case 'incomplete':
+      case 'incomplete_expired':
+        status = 'pending';
+        break;
+      case 'trialing':
+        status = 'trialing';
+        break;
+      case 'active':
+      case 'past_due':
+        status = 'active';
+        break;
+      case 'canceled':
+      case 'unpaid':
+        status = 'canceled';
+        break;
+    }
+  }
   switch (eventType) {
     case 'customer.subscription.created':
-      switch (data.status) {
-        case 'incomplete':
-        case 'incomplete_expired':
-          status = 'pending';
-          break;
-        case 'trialing':
-          status = 'trialing';
-          break;
-        case 'active':
-        case 'past_due':
-          status = 'active';
-          break;
-        case 'canceled':
-        case 'unpaid':
-          status = 'canceled';
-          break;
-      }
+
       try {
         r = await axios({
           method: 'post',
@@ -155,6 +160,8 @@ app.post('/webhook', async (request, response) => {
         console.error(error);
         return response.sendStatus(500);
       }
+      break;
+    case 'customer.subscription.updated':
       break;
     case 'invoice.paid':
       switch (data.status) {
@@ -195,9 +202,11 @@ app.post('/webhook', async (request, response) => {
       break;
   }
   console.log('POST /webhook'); // TODO
-  console.log()
   console.log({eventType}); // TODO
-  console.log(r.data); // TODO
+  if (data) console.log(data); // TODO
+  else console.log('data is empty'); // TODO
+  if (r.data) console.log(r.data); // TODO
+  else console.log('r.data is empty'); // TODO
   return response.sendStatus(200);
 });
 
