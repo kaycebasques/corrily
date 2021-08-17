@@ -4,14 +4,13 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const stripe = require('stripe')(process.env.STRIPE);
 const nunjucks = require('nunjucks');
+const uuidv4 = require('uuid').v4;
 // Store user/session information in memory to keep the app simple/minimal.
 let sessionData = {};
 
 nunjucks.configure('templates', {
   autoescape: false
 });
-
-// TODO: UUIDs https://www.npmjs.com/package/uuid?activeTab=readme
 
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
@@ -20,6 +19,7 @@ app.use(express.static('static', {
 }));
 
 app.get('/', async (request, response) => {
+  const user_id = uuidv4();
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const result = await axios({
     method: 'post',
@@ -29,7 +29,8 @@ app.get('/', async (request, response) => {
     },
     data: {
       products: ['monthly', 'annual'],
-      ip
+      ip,
+      user_id
     },
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
