@@ -220,11 +220,12 @@ app.post('/webhook', async (request, response) => {
             origin_id: item.id,
             product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
             status,
-            user_id: data.customer
+            user_id: uuid
           },
           url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/charges'
         });
       } catch (error) {
+        console.error(erro)
         return response.sendStatus(500);
       }
       break;
@@ -243,5 +244,5 @@ app.post('/webhook', async (request, response) => {
 });
 
 app.listen(8080, () => {
-  console.info('Running!');
+  console.info('🚀');
 });
