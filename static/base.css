@@ -1,0 +1,8 @@
+main {
+  display: grid;
+}
+
+.tagline {
+  grid-area: tagline;
+  place-self: center;
+}

@@ -46,12 +46,16 @@ app.get('/', async (request, response) => {
 
 app.post('/email', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
-  const renderData = {ip, id};
-  return response.send(nunjucks.render('email.html', renderData));
+  const {id} = request.body;
+  sessionData[ip].id = id;
+  return response.sendFile('email.html');
 });
 
 app.post('/subscribe', async (request, response) => {
-  const {ip, id} = request.body;
+  const ip = request.headers['x-forwarded-for'].split(',')[0];
+  const id = sessionData[ip].id;
+  const {email} = request.body;
+  sessionData[ip].email = email;
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],

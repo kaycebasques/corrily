@@ -9,19 +9,12 @@
 }
 
 main {
-  display: grid;
   grid-template-areas:
       "tagline tagline"
-      "monthly annual"
-      "email email";
+      "monthly annual";
 }
 
 .monthly {
   grid-area: monthly;
-  place-self: center;
-}
-
-.tagline {
-  grid-area: tagline;
   place-self: center;
 }
