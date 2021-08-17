@@ -12,13 +12,13 @@ nunjucks.configure('templates', {
   autoescape: false
 });
 
-app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static', {
   extensions: ['html']
 }));
 
 app.get('/', async (request, response) => {
+  console.log('GET /'); // TODO
   const uuid = uuidv4();
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const result = await axios({
@@ -34,6 +34,8 @@ app.get('/', async (request, response) => {
     },
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
+  console.log('Corrily response'); // TODO
+  console.log(result.data); // TODO
   const priceData = result.data;
   if (!sessionData[uuid]) sessionData[uuid] = {};
   sessionData[uuid].ip = ip;
@@ -47,6 +49,7 @@ app.get('/', async (request, response) => {
 });
 
 app.post('/email', async (request, response) => {
+  console.log('POST /email'); // TODO
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const {product, uuid} = request.body;
   sessionData[uuid].product = product;
@@ -84,6 +87,8 @@ app.post('/subscribe', async (request, response) => {
   return response.redirect(session.url);
 });
 
+app.use('/webhook', bodyParser.raw({type: '*/*'}));
+
 app.post('/webhook', async (request, response) => {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return response.sendStatus(500);
@@ -96,8 +101,7 @@ app.post('/webhook', async (request, response) => {
     return response.sendStatus(400);
   }
   const data = event.data.object;
-  // In this demo we're assuming that there's only one line item.
-  // In a production app you should check if you have more than one.
+  // Assuming there's only one line item to keep the app simple/minimal.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
