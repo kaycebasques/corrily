@@ -5,7 +5,25 @@
     <title>Corrily demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/base.css" rel="stylesheet">
-    <link href="/index.css" rel="stylesheet">
+    <style>
+      .annual {
+        grid-area: annual;
+        place-self: center;
+      }
+      .email {
+        grid-area: email;
+        place-self: center;
+      }
+      main {
+        grid-template-areas:
+            "tagline tagline"
+            "monthly annual";
+      }
+      .monthly {
+        grid-area: monthly;
+        place-self: center;
+      }
+    </style>
   </head>
   <body>
     <main>

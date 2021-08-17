@@ -1,4 +1,3 @@
-// v2
 const express = require('express');
 const app = express();
 const axios = require('axios');
@@ -34,9 +33,6 @@ app.get('/', async (request, response) => {
     },
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
-  console.log('GET /'); // TODO
-  console.log('Corrily response'); // TODO
-  console.log(result.data); // TODO
   const priceData = result.data;
   if (!sessionData[uuid]) sessionData[uuid] = {};
   sessionData[uuid].ip = ip;
@@ -46,6 +42,11 @@ app.get('/', async (request, response) => {
     annual: priceData.products.annual.display.price,
     uuid: uuid
   };
+  console.log('GET /');
+  console.log('Corrily price data:');
+  console.log(priceData);
+  console.log('Session data:');
+  console.log(sessionData);
   return response.send(nunjucks.render('index.html', renderData));
 });
 
@@ -56,9 +57,9 @@ app.post('/email', async (request, response) => {
   const renderData = {
     uuid: uuid
   };
-  console.log('POST /email'); // TODO
-  console.log('Session data'); // TODO
-  console.log(sessionData); // TODO
+  console.log('POST /email');
+  console.log('Session data');
+  console.log(sessionData);
   return response.send(nunjucks.render('email.html', renderData));
 });
 
@@ -87,11 +88,11 @@ app.post('/subscribe', async (request, response) => {
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
     cancel_url: 'https://corrily.glitch.me/cancel'
   });
-  console.log('POST /subscribe'); // TODO
-  console.log('Session data'); // TODO
-  console.log(sessionData); // TODO
-  console.log('Stripe session'); // TODO
-  console.log(session); // TODO
+  console.log('POST /subscribe');
+  console.log('Stripe session data:');
+  console.log(session);
+  console.log('Session data:');
+  console.log(sessionData);
   return response.redirect(session.url);
 });
 
@@ -109,13 +110,13 @@ app.post('/webhook', async (request, response) => {
     return response.sendStatus(400);
   }
   const data = event.data.object;
-  // Assuming there's only one line item to keep the app simple/minimal.
+  // Assume there's only one line item to keep the app simple/minimal.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
   const email = data.customer_email;
   
-  let r; // TODO
+  let corrilyResponse;
   function map(status) {
     switch (status) {
       case 'incomplete':
@@ -144,7 +145,7 @@ app.post('/webhook', async (request, response) => {
   switch (eventType) {
     case 'customer.subscription.created':
       try {
-        r = await axios({
+        corrilyResponse = await axios({
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -171,7 +172,7 @@ app.post('/webhook', async (request, response) => {
       const base = 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions';
       const url = `${base}/${uuid}/stripe/${data.id}`;
       try {
-        r = await axios({
+        corrilyResponse = await axios({
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -205,7 +206,7 @@ app.post('/webhook', async (request, response) => {
           break;
       }
       try {
-        r = await axios({
+        corrilyResponse = await axios({
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -228,12 +229,16 @@ app.post('/webhook', async (request, response) => {
       }
       break;
   }
-  console.log('POST /webhook'); // TODO
-  console.log({eventType}); // TODO
-  if (data) console.log(data); // TODO
-  else console.log('data is empty'); // TODO
-  if (r && r.data) console.log(r.data); // TODO
-  else console.log('r or r.data is empty'); // TODO
+  console.log('POST /webhook');
+  console.log(`Event type: ${eventType}`);
+  if (data) {
+    console.log('Event data:');
+    console.log(data);
+  }
+  if (corrilyResponse && corrilyResponse.data) {
+    console.log('Corrily response data:');
+    console.log(corrilyResponse.data);
+  }
   return response.sendStatus(200);
 });
 
