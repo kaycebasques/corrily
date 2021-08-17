@@ -4,15 +4,14 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const stripe = require('stripe')(process.env.STRIPE);
 const nunjucks = require('nunjucks');
-// For simplicity this demo stores user/session information in memory.
-// This will not work for your production app.
+// Store user/session information in memory to keep the app simple/minimal.
 let sessionData = {};
 
 nunjucks.configure('templates', {
   autoescape: false
 });
 
-// 7
+// TODO: UUIDs https://www.npmjs.com/package/uuid?activeTab=readme
 
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
