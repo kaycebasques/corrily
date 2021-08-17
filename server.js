@@ -133,10 +133,14 @@ app.post('/webhook', async (request, response) => {
   }
   async function resolve(customerId) {
     const {email} = await stripe.customers.retrieve(customerId);
+    let uuid;
     for (const key in sessionData) {
-      
+      if (sessionData[key].email === email) uuid = key;
     }
+    return uuid;
   }
+  let uuid;
+  if (data.customer) uuid = await resolve(data.customer);
   switch (eventType) {
     case 'customer.subscription.created':
       try {
@@ -151,10 +155,10 @@ app.post('/webhook', async (request, response) => {
             created: item.created,
             currency: item.price.currency.toUpperCase(),
             origin: 'stripe',
-            origin_id: item.id,
+            origin_id: data.id,
             product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
             status: map(data.status),
-            user_id: data.customer
+            user_id: uuid
           },
           url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
         });
@@ -164,8 +168,8 @@ app.post('/webhook', async (request, response) => {
       }
       break;
     case 'customer.subscription.updated':
-      // const base = 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions';
-      // const url = `${base}/${uuid}/stripe/${???}`
+      const base = 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions';
+      const url = `${base}/${uuid}/stripe/${data.id}`;
       try {
         r = await axios({
           method: 'post',
@@ -175,15 +179,10 @@ app.post('/webhook', async (request, response) => {
           },
           data: {
             amount: item.price.unit_amount,
-            created: item.created,
             currency: item.price.currency.toUpperCase(),
-            origin: 'stripe',
-            origin_id: item.id,
-            product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
-            status: map(data.status),
-            user_id: data.customer
+            status: map(data.status)
           },
-          url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/subscriptions'
+          url
         });
       } catch (error) {
         console.error(error);
