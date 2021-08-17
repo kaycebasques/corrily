@@ -12,14 +12,16 @@
       <h1 class="tagline">Corrily demo</h1>
       <form class="monthly" action="/email" method="POST">
         <h2>Monthly</h2>
-        <p>{{ monthly }}</p>
+        <p>{{monthly}}</p>
         <input type="hidden" name="id" value="monthly">
+        <input type="hidden" name="uuid" value="{{uuid}}">
         <input type="submit" value="Subscribe">
       </form>
       <form class="annual" action="/email" method="POST">
         <h2>Annual</h2>
-        <p>{{ annual }}</p>
+        <p>{{annual}}</p>
         <input type="hidden" name="id" value="annual">
+        <input type="hidden" name="uuid" value="{{uuid}}">
         <input type="submit" value="Subscribe">
       </form>
     </main>

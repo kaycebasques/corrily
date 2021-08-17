@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 const bodyParser = require('body-parser');
-const stripe = require('stripe')(process.env.STRIPE);
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const nunjucks = require('nunjucks');
 const uuidv4 = require('uuid').v4;
 // Store user/session information in memory to keep the app simple/minimal.
@@ -19,43 +19,45 @@ app.use(express.static('static', {
 }));
 
 app.get('/', async (request, response) => {
-  const user_id = uuidv4();
+  const uuid = uuidv4();
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const result = await axios({
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
-      api_key: process.env.CORRILY
+      api_key: process.env.CORRILY_API_KEY
     },
     data: {
       products: ['monthly', 'annual'],
       ip,
-      user_id
+      user_id: uuid
     },
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
   const priceData = result.data;
-  if (!sessionData[ip]) sessionData[ip] = {};
-  sessionData[ip].prices = priceData;
+  if (!sessionData[uuid]) sessionData[uuid] = {};
+  sessionData[uuid].ip = ip;
+  sessionData[uuid].prices = priceData;
   const renderData = {
     monthly: priceData.products.monthly.display.price,
-    annual: priceData.products.annual.display.price
+    annual: priceData.products.annual.display.price,
+    user_id: uuid
   };
   return response.send(nunjucks.render('index.html', renderData));
 });
 
 app.post('/email', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
-  const {id} = request.body;
-  sessionData[ip].id = id;
+  const {id, uuid} = request.body;
+  sessionData[uuid].id = id;
   return response.sendFile(`${__dirname}/static/email.html`);
 });
 
 app.post('/subscribe', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
-  const id = sessionData[ip].id;
-  const {email} = request.body;
-  sessionData[ip].email = email;
+  const {email, uuid} = request.body;
+  const id = sessionData[uuid].id;
+  sessionData[uuid].email = email;
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -64,8 +66,8 @@ app.post('/subscribe', async (request, response) => {
         quantity: 1,
         price_data: {
           product: 'prod_K2Fkw36WcU2GXi',
-          unit_amount: sessionData[ip].prices.products[id].integrations.stripe.amount,
-          currency: sessionData[ip].prices.currency,
+          unit_amount: sessionData[uuid].prices.products[id].integrations.stripe.amount,
+          currency: sessionData[uuid].prices.currency,
           recurring: {
             interval: id === 'monthly' ? 'month' : 'year'
           }
@@ -80,7 +82,7 @@ app.post('/subscribe', async (request, response) => {
 });
 
 app.post('/webhook', async (request, response) => {
-  const secret = process.env.WEBHOOK_SECRET;
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return response.sendStatus(500);
   let event;
   const signature = request.headers['stripe-signature'];
@@ -124,7 +126,7 @@ app.post('/webhook', async (request, response) => {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
-            api_key: process.env.CORRILY
+            api_key: process.env.CORRILY_API_KEY
           },
           data: {
             amount: item.price.unit_amount,
@@ -162,7 +164,7 @@ app.post('/webhook', async (request, response) => {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
-            api_key: process.env.CORRILY
+            api_key: process.env.CORRILY_API_KEY
           },
           data: {
             amount: item.price.unit_amount,
