@@ -1,4 +1,4 @@
-// v1
+// v2
 const express = require('express');
 const app = express();
 const axios = require('axios');
@@ -152,7 +152,7 @@ app.post('/webhook', async (request, response) => {
           },
           data: {
             amount: item.price.unit_amount,
-            created: item.created,
+            created: data.created,
             currency: item.price.currency.toUpperCase(),
             origin: 'stripe',
             origin_id: data.id,
@@ -180,7 +180,8 @@ app.post('/webhook', async (request, response) => {
           data: {
             amount: item.price.unit_amount,
             currency: item.price.currency.toUpperCase(),
-            status: map(data.status)
+            status: map(data.status),
+            created: data.created
           },
           url
         });
