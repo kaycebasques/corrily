@@ -132,16 +132,18 @@ app.post('/webhook', async (request, response) => {
         return 'canceled';
     }
   }
-  async function resolve(customerId) {
-    const {email} = await stripe.customers.retrieve(customerId);
-    let uuid;
+  let uuid;
+  if (data.customer) {
+    const {email} = await stripe.customers.retrieve(data.customer);
     for (const key in sessionData) {
       if (sessionData[key].email === email) uuid = key;
     }
-    return uuid;
   }
-  let uuid;
-  if (data.customer) uuid = await resolve(data.customer);
+  if (data.customer_email) {
+    for (const key in sessionData) {
+      if (sessionData[key].email === data.customer_email) uuid = key;
+    }
+  }
   switch (eventType) {
     case 'customer.subscription.created':
       try {
@@ -214,10 +216,10 @@ app.post('/webhook', async (request, response) => {
           },
           data: {
             amount: item.price.unit_amount,
-            created: item.created,
+            created: data.created,
             currency: item.price.currency.toUpperCase(),
             origin: 'stripe',
-            origin_id: item.id,
+            origin_id: data.id,
             product: item.price.recurring.interval === 'month' ? 'monthly' : 'annual',
             status,
             user_id: uuid
@@ -225,7 +227,8 @@ app.post('/webhook', async (request, response) => {
           url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/charges'
         });
       } catch (error) {
-        console.error(erro)
+        console.error(error.response.data);
+        console.log(data);
         return response.sendStatus(500);
       }
       break;
