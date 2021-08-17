@@ -79,7 +79,7 @@ app.post('/webhook', async (request, response) => {
   }
   const data = event.data.object;
   // In this demo we're assuming that there's only one line item.
-  // In a real application you should check if you have more than one.
+  // In a production app you should check if you have more than one.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
