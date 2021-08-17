@@ -18,7 +18,6 @@ app.use(express.static('static', {
 }));
 
 app.get('/', async (request, response) => {
-  console.log('GET /'); // TODO
   const uuid = uuidv4();
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const result = await axios({
@@ -34,6 +33,7 @@ app.get('/', async (request, response) => {
     },
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
+  console.log('GET /'); // TODO
   console.log('Corrily response'); // TODO
   console.log(result.data); // TODO
   const priceData = result.data;
@@ -49,13 +49,15 @@ app.get('/', async (request, response) => {
 });
 
 app.post('/email', async (request, response) => {
-  console.log('POST /email'); // TODO
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const {product, uuid} = request.body;
   sessionData[uuid].product = product;
   const renderData = {
     uuid: uuid
   };
+  console.log('POST /email'); // TODO
+  console.log('Session data'); // TODO
+  console.log(sessionData); // TODO
   return response.send(nunjucks.render('email.html', renderData));
 });
 
@@ -105,10 +107,7 @@ app.post('/webhook', async (request, response) => {
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
-  console.log(eventType); // TODO
-  console.log(data); // TODO
-  const email = data.customer_email;
-  let ip; // TODO lookup the IP address?
+  let r; // TODO
   switch (eventType) {
     case 'customer.subscription.created':
       switch (data.status) {
@@ -129,7 +128,7 @@ app.post('/webhook', async (request, response) => {
           break;
       }
       try {
-        await axios({
+        r = await axios({
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -167,7 +166,7 @@ app.post('/webhook', async (request, response) => {
           break;
       }
       try {
-        const r = await axios({
+        r = await axios({
           method: 'post',
           headers: {
             'Content-Type': 'application/json',
@@ -185,13 +184,14 @@ app.post('/webhook', async (request, response) => {
           },
           url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/charges'
         });
-        console.log(r.data); // TODO
       } catch (error) {
-        console.error(error);
         return response.sendStatus(500);
       }
       break;
   }
+  console.log('POST /webhook'); // TODO
+  console.log({eventType}); // TODO
+  console.log(r.data); // TODO
   return response.sendStatus(200);
 });
 
