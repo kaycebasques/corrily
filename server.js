@@ -98,6 +98,8 @@ app.post('/webhook', async (request, response) => {
   const eventType = event.type;
   console.log(eventType); // TODO
   console.log(data); // TODO
+  const email = data.customer_email;
+  let ip; // TODO lookup the IP address?
   switch (eventType) {
     case 'customer.subscription.created':
       switch (data.status) {
@@ -155,8 +157,6 @@ app.post('/webhook', async (request, response) => {
           status = 'failed';
           break;
       }
-      const email = data.customer_email;
-      let ip;
       try {
         const r = await axios({
           method: 'post',
