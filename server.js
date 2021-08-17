@@ -86,6 +86,9 @@ app.post('/subscribe', async (request, response) => {
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
     cancel_url: 'https://corrily.glitch.me/cancel'
   });
+  console.log('POST /subscribe'); // TODO
+  console.log('Session data'); // TODO
+  console.log(sessionData); // TODO
   return response.redirect(session.url);
 });
 
@@ -107,6 +110,8 @@ app.post('/webhook', async (request, response) => {
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
+  const email = data.customer_email;
+  
   let r; // TODO
   switch (eventType) {
     case 'customer.subscription.created':
@@ -190,6 +195,7 @@ app.post('/webhook', async (request, response) => {
       break;
   }
   console.log('POST /webhook'); // TODO
+  console.log()
   console.log({eventType}); // TODO
   console.log(r.data); // TODO
   return response.sendStatus(200);
