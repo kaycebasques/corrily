@@ -35,13 +35,19 @@ app.get('/', async (request, response) => {
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
   const priceData = result.data;
-  sessionData[ip] = priceData;
+  sessionData[ip].prices = priceData;
   const renderData = {
     monthly: priceData.products.monthly.display.price,
     annual: priceData.products.annual.display.price,
     ip
   };
   return response.send(nunjucks.render('index.html', renderData));
+});
+
+app.post('/email', async (request, response) => {
+  const ip = request.headers['x-forwarded-for'].split(',')[0];
+  const renderData = {ip, id};
+  return response.send(nunjucks.render('email.html', renderData));
 });
 
 app.post('/subscribe', async (request, response) => {
@@ -54,8 +60,8 @@ app.post('/subscribe', async (request, response) => {
         quantity: 1,
         price_data: {
           product: 'prod_K2Fkw36WcU2GXi',
-          unit_amount: sessionData[ip].products[id].integrations.stripe.amount,
-          currency: sessionData[ip].currency,
+          unit_amount: sessionData[ip].prices.products[id].integrations.stripe.amount,
+          currency: sessionData[ip].prices.currency,
           recurring: {
             interval: id === 'monthly' ? 'month' : 'year'
           }
