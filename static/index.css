@@ -3,6 +3,11 @@
   place-self: center;
 }
 
+.email {
+  grid-area: email;
+  place-self: center;
+}
+
 main {
   display: grid;
   grid-template-areas:

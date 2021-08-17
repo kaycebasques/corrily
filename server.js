@@ -12,6 +12,8 @@ nunjucks.configure('templates', {
   autoescape: false
 });
 
+// 4
+
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static', {
