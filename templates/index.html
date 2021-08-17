@@ -13,14 +13,12 @@
       <form class="monthly" action="/email" method="POST">
         <h2>Monthly</h2>
         <p>{{ monthly }}</p>
-        <input type="hidden" name="ip" value="{{ ip }}">
         <input type="hidden" name="id" value="monthly">
         <input type="submit" value="Subscribe">
       </form>
       <form class="annual" action="/email" method="POST">
         <h2>Annual</h2>
         <p>{{ annual }}</p>
-        <input type="hidden" name="ip" value="{{ ip }}">
         <input type="hidden" name="id" value="annual">
         <input type="submit" value="Subscribe">
       </form>

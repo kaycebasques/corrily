@@ -12,7 +12,7 @@ nunjucks.configure('templates', {
   autoescape: false
 });
 
-// 6
+// 7
 
 app.use('/webhook', bodyParser.raw({type: '*/*'}));
 app.use(bodyParser.urlencoded({extended: false}));
@@ -35,12 +35,13 @@ app.get('/', async (request, response) => {
     url: 'https://mainapi-staging-4hqypo5h6a-uc.a.run.app/v1/prices'
   });
   const priceData = result.data;
+  if (!sessionData[ip]) sessionData[ip] = {};
   sessionData[ip].prices = priceData;
   const renderData = {
     monthly: priceData.products.monthly.display.price,
-    annual: priceData.products.annual.display.price,
-    ip
+    annual: priceData.products.annual.display.price
   };
+  console.log(sessionData); // TODO
   return response.send(nunjucks.render('index.html', renderData));
 });
 
@@ -48,7 +49,8 @@ app.post('/email', async (request, response) => {
   const ip = request.headers['x-forwarded-for'].split(',')[0];
   const {id} = request.body;
   sessionData[ip].id = id;
-  return response.sendFile('email.html');
+  console.log(sessionData); // TODO
+  return response.sendFile(`${__dirname}/static/email.html`);
 });
 
 app.post('/subscribe', async (request, response) => {
@@ -72,9 +74,14 @@ app.post('/subscribe', async (request, response) => {
         }
       }
     ],
+    metadata: {
+      ip
+    },
+    customer_email: email,
     success_url: 'https://corrily.glitch.me/success?session_id={CHECKOUT_SESSION_ID}',
     cancel_url: 'https://corrily.glitch.me/cancel'
   });
+  console.log(sessionData); // TODO
   return response.redirect(session.url);
 });
 
@@ -90,12 +97,12 @@ app.post('/webhook', async (request, response) => {
     return response.sendStatus(400);
   }
   const data = event.data.object;
+  console.log(data); // TODO
   // In this demo we're assuming that there's only one line item.
   // In a production app you should check if you have more than one.
   const item = data.lines ? data.lines.data[0] : data.items.data[0];
   let status;
   const eventType = event.type;
-  let r;
   switch (eventType) {
     case 'customer.subscription.created':
       switch (data.status) {
