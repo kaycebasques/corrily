@@ -15,6 +15,10 @@
             "tagline"
             "email";
       }
+      .tip {
+        grid-area: tip;
+        place-self: center;
+      }
     </style>
   </head>
   <body>
@@ -26,6 +30,10 @@
         <input type="hidden" name="uuid" value="{{uuid}}">
         <input type="submit" value="Continue">
       </form>
+      <p class="tip">
+        Tip: On the next screen you can use one of Stripe's
+        <a href="https://stripe.com/docs/testing#cards">test cards</a>.
+      </p>
     </main>
   </body>
 </html>
