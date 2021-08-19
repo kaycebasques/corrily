@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
-const axios = require('axios');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const nunjucks = require('nunjucks');
 const uuidv4 = require('uuid').v4;
+
 // Store user/session information in memory to keep the app simple/minimal.
 let sessionData = {};
 
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('static', {
   extensions: ['html']
 }));
+app.use('/webhook', bodyParser.raw({type: '*/*'}));
 
 app.get('/', async (request, response) => {
   const uuid = uuidv4();
@@ -95,8 +97,6 @@ app.post('/subscribe', async (request, response) => {
   console.log(sessionData);
   return response.redirect(session.url);
 });
-
-app.use('/webhook', bodyParser.raw({type: '*/*'}));
 
 app.post('/webhook', async (request, response) => {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
