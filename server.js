@@ -77,7 +77,7 @@ app.post('/subscribe', async (request, response) => {
       {
         quantity: 1,
         price_data: {
-          product: 'prod_K2Fkw36WcU2GXi',
+          product: process.env.STRIPE_PRODUCT_ID,
           unit_amount: sessionData[uuid].prices.products[product].integrations.stripe.amount,
           currency: sessionData[uuid].prices.currency,
           recurring: {
